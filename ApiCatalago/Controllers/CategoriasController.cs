@@ -1,10 +1,11 @@
 ﻿using ApiCatalago.Context;
 using ApiCatalago.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace ApiCatalago.Controllers
 {
-    
+
     [ApiController]
     [Route("[controller]")]
     public class CategoriasController : ControllerBase
@@ -49,6 +50,25 @@ namespace ApiCatalago.Controllers
 
         }
 
+
+        [HttpGet("produtos")]
+        public ActionResult<IEnumerable<Categoria>> GetCategoriaWithProdutos()
+        {
+
+            var categorias = _context.Categorias.Include(p => p.Produtos).ToList();
+
+
+            if (categorias is null)
+            {
+                return NotFound("Nenhum produto encontrado...");
+            }
+
+            return categorias;
+
+
+        }
+
+
         [HttpPost]
         public ActionResult<Categoria> AddCategoria(Categoria categoria)
         {
@@ -67,6 +87,43 @@ namespace ApiCatalago.Controllers
                     new { id = categoria.CategoriaId }, categoria);
         }
 
+
+        [HttpPut("{Id}")]
+        public ActionResult EditCategoria(int Id, Categoria categoria)
+        {
+
+            if (categoria is null)
+            {
+                return NotFound("categoria invalida");
+            }
+
+            _context.Entry(categoria).State = EntityState.Modified;
+            _context.SaveChanges();
+
+
+            return Ok(categoria);
+        }
+
+
+
+        [HttpDelete("{Id}")]
+        public ActionResult removeCategoria(int Id)
+        {
+
+            var categoria = _context.Categorias.FirstOrDefault(c => c.CategoriaId == Id);
+
+
+            if (categoria is null)
+            {
+                return NotFound("Categoria nao encontrada");
+            }
+
+            _context.Categorias.Remove(categoria);
+            _context.SaveChanges();
+
+            return Ok(categoria);
+
+        }
 
     }
 }
