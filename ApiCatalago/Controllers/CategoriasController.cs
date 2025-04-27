@@ -23,30 +23,52 @@ namespace ApiCatalago.Controllers
         public ActionResult<IEnumerable<Categoria>> GetCategorias()
         {
 
-            var categorias = _context.Categorias.ToList();
-
-            if (categorias is null)
+            try
             {
-                return NotFound("Nenhum produto encontrado...");
+                var categorias = _context.Categorias.AsNoTracking().ToList(); //AsNoTracking limpa o cache da listagem.
+
+                if (categorias is null)
+                {
+                    return NotFound("Nenhum produto encontrado...");
+                }
+
+                return categorias;
+
+            }
+            catch (Exception)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um erro ao tratar sua solicitação!");
             }
 
-            return categorias;
+
 
         }
 
 
-        [HttpGet("{Id}", Name = "Obter categoria")]
-        public ActionResult<Categoria> GetCategoriaById(int categoriaId)
+        [HttpGet("{id}", Name = "Obter categoria")]
+        public ActionResult<Categoria> GetCategoriaById(int id)
         {
-            var categoria = _context.Categorias.FirstOrDefault(c => c.CategoriaId == categoriaId);
 
-            if (categoria is null)
+
+            try
             {
-                return BadRequest("Nenhuma categoria encontrada");
+                var categoria = _context.Categorias.FirstOrDefault(c => c.CategoriaId == id);
+
+                if (categoria is null)
+                {
+                    return BadRequest("Nenhuma categoria encontrada");
+                }
+
+
+                return categoria;
+            }
+            catch (Exception)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um erro ao tratar sua solicitação!");
             }
 
-
-            return categoria;
 
         }
 
@@ -55,15 +77,25 @@ namespace ApiCatalago.Controllers
         public ActionResult<IEnumerable<Categoria>> GetCategoriaWithProdutos()
         {
 
-            var categorias = _context.Categorias.Include(p => p.Produtos).ToList();
-
-
-            if (categorias is null)
+            try
             {
-                return NotFound("Nenhum produto encontrado...");
+                var categorias = _context.Categorias.Include(p => p.Produtos).ToList();
+
+
+                if (categorias is null)
+                {
+                    return NotFound("Nenhum produto encontrado...");
+                }
+
+                return categorias;
+            }
+            catch (Exception)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um erro ao tratar sua solicitação!");
             }
 
-            return categorias;
+
 
 
         }
@@ -73,18 +105,29 @@ namespace ApiCatalago.Controllers
         public ActionResult<Categoria> AddCategoria(Categoria categoria)
         {
 
-            if (categoria is null)
+
+            try
+            {
+                if (categoria is null)
+                {
+
+                    return BadRequest("Categoria invalida");
+
+                }
+
+                _context.Categorias.Add(categoria);
+                _context.SaveChanges();
+
+                return new CreatedAtRouteResult("Obter categoria",
+                        new { id = categoria.CategoriaId }, categoria);
+            }
+            catch (Exception)
             {
 
-                return BadRequest("Categoria invalida");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um erro ao tratar sua solicitação!");
 
             }
 
-            _context.Categorias.Add(categoria);
-            _context.SaveChanges();
-
-            return new CreatedAtRouteResult("Obter categoria",
-                    new { id = categoria.CategoriaId }, categoria);
         }
 
 
@@ -92,16 +135,28 @@ namespace ApiCatalago.Controllers
         public ActionResult EditCategoria(int Id, Categoria categoria)
         {
 
-            if (categoria is null)
+
+            try
             {
-                return NotFound("categoria invalida");
+                if (categoria is null)
+                {
+                    return NotFound("categoria invalida");
+                }
+
+                _context.Entry(categoria).State = EntityState.Modified;
+                _context.SaveChanges();
+
+
+                return Ok(categoria);
+            }
+            catch (Exception)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um erro ao tratar sua solicitação!");
+
             }
 
-            _context.Entry(categoria).State = EntityState.Modified;
-            _context.SaveChanges();
 
-
-            return Ok(categoria);
         }
 
 
@@ -110,18 +165,29 @@ namespace ApiCatalago.Controllers
         public ActionResult removeCategoria(int Id)
         {
 
-            var categoria = _context.Categorias.FirstOrDefault(c => c.CategoriaId == Id);
 
-
-            if (categoria is null)
+            try
             {
-                return NotFound("Categoria nao encontrada");
+                var categoria = _context.Categorias.FirstOrDefault(c => c.CategoriaId == Id);
+
+
+                if (categoria is null)
+                {
+                    return NotFound("Categoria nao encontrada");
+                }
+
+                _context.Categorias.Remove(categoria);
+                _context.SaveChanges();
+
+                return Ok(categoria);
+            }
+            catch (Exception)
+            {
+
+                                return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um erro ao tratar sua solicitação!");
+
             }
 
-            _context.Categorias.Remove(categoria);
-            _context.SaveChanges();
-
-            return Ok(categoria);
 
         }
 
