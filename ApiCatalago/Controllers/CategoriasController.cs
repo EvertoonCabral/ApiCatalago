@@ -35,7 +35,7 @@ namespace ApiCatalago.Controllers
         }
 
 
-        [HttpGet("{id}", Name = "Obter categoria")]
+        [HttpGet("{Id}", Name = "Obter categoria")]
         public ActionResult<Categoria> GetCategoriaById(int categoriaId)
         {
             var categoria = _context.Categorias.FirstOrDefault(c => c.CategoriaId == categoriaId);
