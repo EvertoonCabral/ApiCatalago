@@ -70,9 +70,9 @@ namespace ApiCatalago.Controllers
 
 
         [HttpPut("{id}")]
-        public ActionResult UpdateProduto(int ProdutoId, Produto produto)
+        public ActionResult UpdateProduto(int id, Produto produto)
         {
-            if (produto.ProdutoId != ProdutoId)
+            if (produto.ProdutoId != id)
             {
                 return BadRequest("Id do produto divergente");
             }
@@ -91,11 +91,11 @@ namespace ApiCatalago.Controllers
         }
 
 
-        [HttpDelete]
-        public ActionResult RemoveProduto(int produtoId)
+        [HttpDelete("{id}")]
+        public ActionResult RemoveProduto(int id)
         {
 
-            var produto = _context.Produtos.FirstOrDefault(p => p.ProdutoId == produtoId);
+            var produto = _context.Produtos.FirstOrDefault(p => p.ProdutoId == id);
 
             if (produto is null)
             {

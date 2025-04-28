@@ -161,35 +161,29 @@ namespace ApiCatalago.Controllers
 
 
 
-        [HttpDelete("{Id}")]
-        public ActionResult removeCategoria(int Id)
+        [HttpDelete("{id}")]
+        public ActionResult RemoveCategoria(int id)
         {
-
-
             try
             {
-                var categoria = _context.Categorias.FirstOrDefault(c => c.CategoriaId == Id);
-
+                var categoria = _context.Categorias.FirstOrDefault(c => c.CategoriaId == id);
 
                 if (categoria is null)
                 {
-                    return NotFound("Categoria nao encontrada");
+                    return NotFound("Categoria não encontrada");
                 }
 
                 _context.Categorias.Remove(categoria);
                 _context.SaveChanges();
 
-                return Ok(categoria);
+                return Ok(new { message = "Categoria removida com sucesso", categoria });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                                return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um erro ao tratar sua solicitação!");
-
+                return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um erro ao tratar sua solicitação!");
             }
-
-
         }
+
 
     }
 }
