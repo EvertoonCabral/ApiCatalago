@@ -20,19 +20,19 @@ namespace ApiCatalago.Controllers
 
 
         [HttpGet]
-        public ActionResult<IEnumerable<Categoria>> GetCategorias()
+        public async Task<ActionResult<IEnumerable<Categoria>>> GetCategorias()
         {
 
             try
             {
-                var categorias = _context.Categorias.AsNoTracking().ToList(); //AsNoTracking limpa o cache da listagem.
+                var categorias = _context.Categorias.AsNoTracking().ToListAsync(); //AsNoTracking limpa o cache da listagem.
 
                 if (categorias is null)
                 {
                     return NotFound("Nenhum produto encontrado...");
                 }
 
-                return categorias;
+                return await categorias;
 
             }
             catch (Exception)
@@ -47,13 +47,13 @@ namespace ApiCatalago.Controllers
 
 
         [HttpGet("{id}", Name = "Obter categoria")]
-        public ActionResult<Categoria> GetCategoriaById(int id)
+        public async Task<ActionResult<Categoria>> GetCategoriaById(int id)
         {
 
 
             try
             {
-                var categoria = _context.Categorias.FirstOrDefault(c => c.CategoriaId == id);
+                var categoria = _context.Categorias.FirstOrDefaultAsync(c => c.CategoriaId == id);
 
                 if (categoria is null)
                 {
@@ -61,7 +61,7 @@ namespace ApiCatalago.Controllers
                 }
 
 
-                return categoria;
+                return await categoria;
             }
             catch (Exception)
             {
@@ -74,12 +74,12 @@ namespace ApiCatalago.Controllers
 
 
         [HttpGet("produtos")]
-        public ActionResult<IEnumerable<Categoria>> GetCategoriaWithProdutos()
+        public async Task<ActionResult<IEnumerable<Categoria>>> GetCategoriaWithProdutos()
         {
 
             try
             {
-                var categorias = _context.Categorias.Include(p => p.Produtos).ToList();
+                var categorias = _context.Categorias.Include(p => p.Produtos).ToListAsync();
 
 
                 if (categorias is null)
@@ -87,7 +87,7 @@ namespace ApiCatalago.Controllers
                     return NotFound("Nenhum produto encontrado...");
                 }
 
-                return categorias;
+                return await categorias;
             }
             catch (Exception)
             {

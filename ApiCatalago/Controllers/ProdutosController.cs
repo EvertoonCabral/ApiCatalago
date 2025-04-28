@@ -20,33 +20,33 @@ namespace ApiCatalago.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Produto>> GetProdutos()
+        public async Task<ActionResult<IEnumerable<Produto>>> GetProdutos()
         {
 
-            var produtos = _context.Produtos.ToList();
+            var produtos = _context.Produtos.ToListAsync();
 
             if (produtos is null)
             {
                 return NotFound("Nenhum produto encontrado...");
             }
 
-            return produtos;
+            return await produtos;
 
         }
 
 
         [HttpGet("{id}", Name ="Obter Produtos")]
-        public ActionResult<Produto> GetProdutoById(int id)
+        public async Task<ActionResult<Produto>> GetProdutoById(int id)
         {
 
-            var produto = _context.Produtos.FirstOrDefault(p => p.ProdutoId ==id);
+            var produto = _context.Produtos.FirstOrDefaultAsync(p => p.ProdutoId ==id);
 
             if (produto is null)
             {
                 return NotFound("Nenhum produto encontrado...");
             }
 
-            return produto;
+            return await produto;
 
         }
 
