@@ -1,5 +1,7 @@
 using ApiCatalago.Context;
 using ApiCatalago.Filters;
+using ApiCatalago.Logging;
+using APICatalogo.Logging;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
@@ -23,6 +25,11 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<ApiLoggingFilter>();
+
+builder.Logging.AddProvider(new CustomLoggerProvider(new CustomLoggerProviderConfig
+{
+    LogLevel = LogLevel.Information
+}));
 
 var app = builder.Build();
 
