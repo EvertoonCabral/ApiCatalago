@@ -23,14 +23,14 @@ namespace ApiCatalago.Controllers
         public async Task<ActionResult<IEnumerable<Produto>>> GetProdutos()
         {
 
-            var produtos = _context.Produtos.ToListAsync();
+            var produtos = await _context.Produtos.ToListAsync();
 
             if (produtos is null)
             {
                 return NotFound("Nenhum produto encontrado...");
             }
 
-            return await produtos;
+            return  produtos;
 
         }
 
@@ -39,14 +39,14 @@ namespace ApiCatalago.Controllers
         public async Task<ActionResult<Produto>> GetProdutoById(int id)
         {
 
-            var produto = _context.Produtos.FirstOrDefaultAsync(p => p.ProdutoId ==id);
+            var produto = await _context.Produtos.FirstOrDefaultAsync(p => p.ProdutoId ==id);
 
             if (produto is null)
             {
                 return NotFound("Nenhum produto encontrado...");
             }
 
-            return await produto;
+            return  produto;
 
         }
 
@@ -54,7 +54,8 @@ namespace ApiCatalago.Controllers
         [HttpPost]
         public ActionResult AddProduto(Produto produto)
         {
-             
+
+            if (!ModelState.IsValid) //controller base ja faz essa validação
             {
                 return BadRequest();
             }
