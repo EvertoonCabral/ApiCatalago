@@ -14,15 +14,20 @@ namespace ApiCatalago.Filters
 
         public void OnActionExecuted(ActionExecutedContext context)
         {
-
+            _logger.LogInformation("##################################################");
             _logger.LogInformation($"{DateTime.Now.ToLongTimeString()}");
             _logger.LogInformation($"ModelState: {context.ModelState.IsValid}");
+            _logger.LogInformation("##################################################");
+
 
         }
 
         public void OnActionExecuting(ActionExecutingContext context)
         {
-            throw new NotImplementedException();
+            _logger.LogInformation("##################################################");
+            _logger.LogInformation($"{DateTime.Now.ToLongTimeString()}");
+            _logger.LogInformation($"Status Code: {context.HttpContext.Response.StatusCode}");
+            _logger.LogInformation("##################################################");
         }
     }
 
