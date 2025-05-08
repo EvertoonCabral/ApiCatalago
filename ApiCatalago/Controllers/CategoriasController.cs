@@ -18,6 +18,8 @@ public class CategoriasController : ControllerBase
         _context = context;
         _logger = logger;
     }
+    
+ 
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Categoria>>> Get()
