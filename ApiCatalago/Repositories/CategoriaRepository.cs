@@ -20,15 +20,11 @@ namespace ApiCatalago.Repositories
 
             var categorias = _context.Categorias.ToList();
 
-            if (categorias == null)
-                throw new ArgumentNullException(nameof(categorias));
-
-
             return categorias;
 
         }
 
-        public ActionResult<Categoria> GetCategoriaById(int id)
+        public Categoria GetCategoriaById(int id)
         {
 
             var categoria = _context.Categorias.FirstOrDefault(c => c.CategoriaId == id);
@@ -43,7 +39,7 @@ namespace ApiCatalago.Repositories
         }
 
 
-        public ActionResult<Categoria> AddCategoria(Categoria categoria)
+        public void AddCategoria(Categoria categoria)
         {
 
             if (categoria == null)
@@ -54,11 +50,11 @@ namespace ApiCatalago.Repositories
             _context.Categorias.Add(categoria);
             _context.SaveChanges();
 
-            return categoria;
+
         }
 
 
-        public ActionResult<Categoria> DeleteCategoria(int id)
+        public void DeleteCategoria(int id)
         {
             var categoria = _context.Categorias.Find(id);
 
@@ -71,11 +67,9 @@ namespace ApiCatalago.Repositories
             _context.Remove(categoria);
             _context.SaveChanges();
 
-            return categoria;
-
         }
 
-        public ActionResult<Categoria> UpdateCategoria(Categoria categoria)
+        public void UpdateCategoria(Categoria categoria)
         {
             if (categoria is null)
             {
@@ -85,7 +79,6 @@ namespace ApiCatalago.Repositories
             _context.Entry(categoria).State = EntityState.Modified;
             _context.SaveChanges();
 
-            return categoria;
 
 
         }

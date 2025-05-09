@@ -6,15 +6,15 @@ namespace ApiCatalago.Repositories
     public interface ICategoriaRepository
     {
 
-        IEnumerable<Categoria> GetAllCategorias();
+      public  IEnumerable<Categoria> GetAllCategorias();
 
-        ActionResult<Categoria> GetCategoriaById(int id);
+        public Categoria? GetCategoriaById(int id);
 
-        ActionResult<Categoria> AddCategoria(Categoria categoria);
+        public void AddCategoria(Categoria categoria);
 
-        ActionResult<Categoria> UpdateCategoria(int id, Categoria categoria);
+        public void UpdateCategoria(Categoria categoria);
 
-        ActionResult<Categoria> DeleteCategoria(int id);
+        public void DeleteCategoria(int id);
 
 
     }
