@@ -1,5 +1,6 @@
 ﻿using ApiCatalago.Context;
 using ApiCatalago.Models;
+using ApiCatalago.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,27 +11,22 @@ namespace ApiCatalago.Controllers
     public class ProdutosController : ControllerBase
     {
 
-        private readonly AppDbContext _context;
+        private readonly IProdutoRepository _repository;
 
-        public ProdutosController(AppDbContext context)
+        public ProdutosController(IProdutoRepository repository)
         {
 
-            _context = context;
+            _repository = repository;
 
         }
 
+
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Produto>>> GetProdutos()
+        public ActionResult<IEnumerable<Produto>> GetProdutos()
         {
 
-            var produtos = await _context.Produtos.ToListAsync();
-
-            if (produtos is null)
-            {
-                return NotFound("Nenhum produto encontrado...");
-            }
-
-            return  produtos;
+            var produtos = _repository.GetProdutos().OrderBy(p => p.ProdutoId).ToList();
+            return  Ok(produtos);
 
         }
 
@@ -38,14 +34,7 @@ namespace ApiCatalago.Controllers
         [HttpGet("{id}", Name ="Obter Produtos")]
         public async Task<ActionResult<Produto>> GetProdutoById(int id)
         {
-
-            var produto = await _context.Produtos.FirstOrDefaultAsync(p => p.ProdutoId ==id);
-
-            if (produto is null)
-            {
-                return NotFound("Nenhum produto encontrado...");
-            }
-
+            var produto =  _repository.GetProduto(id);
             return  produto;
 
         }
@@ -55,39 +44,21 @@ namespace ApiCatalago.Controllers
         public ActionResult AddProduto(Produto produto)
         {
 
-            if (!ModelState.IsValid) //controller base ja faz essa validação
-            {
-                return BadRequest();
-            }
-
-            _context.Produtos.Add(produto);
-            _context.SaveChanges();
-
-
-            return new CreatedAtRouteResult("Obter Produtos",
-                new { id = produto.ProdutoId }, produto);
-
+            _repository.CreateProdutos(produto);
+            return Ok(produto);
+            
         }
 
 
         [HttpPut("{id}")]
         public ActionResult UpdateProduto(int id, Produto produto)
         {
-            if (produto.ProdutoId != id)
-            {
-                return BadRequest("Id do produto divergente");
-            }
+        
+            var produtos = _repository.GetProduto(id);
+            
+            _repository.UpdateProduto(produtos);     
 
-            if (produto is null)
-            {
-                return BadRequest("Produto invalido.");
-            }
-
-
-            _context.Entry(produto).State = EntityState.Modified;
-            _context.SaveChanges();
-
-            return Ok(produto);
+            return Ok(produtos);
 
         }
 
@@ -95,17 +66,9 @@ namespace ApiCatalago.Controllers
         [HttpDelete("{id}")]
         public ActionResult RemoveProduto(int id)
         {
+            var produto = _repository.GetProduto(id);
 
-            var produto = _context.Produtos.FirstOrDefault(p => p.ProdutoId == id);
-
-            if (produto is null)
-            {
-                return BadRequest("Produto Invalido");
-
-            }
-
-            _context.Produtos.Remove(produto);
-            _context.SaveChanges();
+            _repository.DeleteProduto(id);
 
 
             return Ok(produto);

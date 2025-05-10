@@ -1,5 +1,7 @@
 ﻿using ApiCatalago.Context;
 using ApiCatalago.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 
 namespace ApiCatalago.Repositories
 {
@@ -29,23 +31,50 @@ namespace ApiCatalago.Repositories
 
         public Produto CreateProdutos(Produto produto)
         {
-            throw new NotImplementedException();
+            
+            var produtos = _context.Produtos;
+
+            produtos.Add(produto);
+            _context.SaveChanges();
+            
+            return produto;
         }
 
         public bool DeleteProduto(int id)
         {
-            throw new NotImplementedException();
+            var produto = _context.Produtos.Find(id);
+            
+            if (produto is null) return false;
+            
+            _context.Produtos.Remove(produto);
+            _context.SaveChanges();
+            
+            return true;
+            
+            
         }
 
         public Produto GetProduto(int id)
         {
-            throw new NotImplementedException();
+
+            var produto = _context.Produtos.FirstOrDefault(p => p.ProdutoId == id);
+            
+            if (produto is null) return null;
+            
+            return produto;
+            
         }
 
 
         public bool UpdateProduto(Produto produto)
         {
-            throw new NotImplementedException();
+            var existing = _context.Produtos.AsNoTracking().FirstOrDefault(p => p.ProdutoId == produto.ProdutoId);
+            if (existing is null) return false;
+
+            _context.Produtos.Update(produto);
+            _context.SaveChanges();
+            return true;
+            
         }
     }
 }
