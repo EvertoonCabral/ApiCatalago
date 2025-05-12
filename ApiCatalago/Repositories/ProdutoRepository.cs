@@ -29,6 +29,18 @@ namespace ApiCatalago.Repositories
 
         }
 
+
+        public Produto GetProdutoById(int id)
+        {
+
+            var produto = _context.Produtos.FirstOrDefault(p => p.ProdutoId == id);
+
+            if (produto is null) return null;
+
+            return produto;
+
+        }
+
         public Produto CreateProdutos(Produto produto)
         {
             
@@ -38,6 +50,17 @@ namespace ApiCatalago.Repositories
             _context.SaveChanges();
             
             return produto;
+        }
+
+        public bool UpdateProduto(Produto produto)
+        {
+            var existing = _context.Produtos.AsNoTracking().FirstOrDefault(p => p.ProdutoId == produto.ProdutoId);
+            if (existing is null) return false;
+
+            _context.Produtos.Update(produto);
+            _context.SaveChanges();
+            return true;
+
         }
 
         public bool DeleteProduto(int id)
@@ -54,27 +77,9 @@ namespace ApiCatalago.Repositories
             
         }
 
-        public Produto GetProduto(int id)
-        {
-
-            var produto = _context.Produtos.FirstOrDefault(p => p.ProdutoId == id);
-            
-            if (produto is null) return null;
-            
-            return produto;
-            
-        }
+ 
 
 
-        public bool UpdateProduto(Produto produto)
-        {
-            var existing = _context.Produtos.AsNoTracking().FirstOrDefault(p => p.ProdutoId == produto.ProdutoId);
-            if (existing is null) return false;
 
-            _context.Produtos.Update(produto);
-            _context.SaveChanges();
-            return true;
-            
-        }
     }
 }

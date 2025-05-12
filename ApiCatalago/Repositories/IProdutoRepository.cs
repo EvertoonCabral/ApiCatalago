@@ -6,7 +6,7 @@ namespace ApiCatalago.Repositories
     {
 
         IQueryable<Produto> GetProdutos();
-        Produto GetProduto(int id);
+        Produto GetProdutoById(int id);
         Produto CreateProdutos(Produto produto);
         bool UpdateProduto(Produto produto);
         bool DeleteProduto(int id);

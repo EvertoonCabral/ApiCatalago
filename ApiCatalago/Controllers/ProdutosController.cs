@@ -34,7 +34,7 @@ namespace ApiCatalago.Controllers
         [HttpGet("{id}", Name ="Obter Produtos")]
         public async Task<ActionResult<Produto>> GetProdutoById(int id)
         {
-            var produto =  _repository.GetProduto(id);
+            var produto =  _repository.GetProdutoById(id);
             return  produto;
 
         }
@@ -54,10 +54,9 @@ namespace ApiCatalago.Controllers
         public ActionResult UpdateProduto(int id, Produto produto)
         {
         
-            var produtos = _repository.GetProduto(id);
+            var produtos = _repository.GetProdutoById(id);
             
             _repository.UpdateProduto(produtos);     
-
             return Ok(produtos);
 
         }
@@ -66,12 +65,11 @@ namespace ApiCatalago.Controllers
         [HttpDelete("{id}")]
         public ActionResult RemoveProduto(int id)
         {
-            var produto = _repository.GetProduto(id);
+            var produto = _repository.GetProdutoById(id);
 
             _repository.DeleteProduto(id);
-
-
             return Ok(produto);
+
 
         }
     }
