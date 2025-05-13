@@ -32,10 +32,10 @@ namespace ApiCatalago.Controllers
 
 
         [HttpGet("{id}", Name ="Obter Produtos")]
-        public async Task<ActionResult<Produto>> GetProdutoById(int id)
+        public ActionResult<Produto> GetProdutoById (int id)
         {
             var produto =  _repository.GetProdutoById(id);
-            return  produto;
+            return  Ok(produto);
 
         }
 
@@ -44,8 +44,8 @@ namespace ApiCatalago.Controllers
         public ActionResult AddProduto(Produto produto)
         {
 
-            _repository.CreateProdutos(produto);
-            return Ok(produto);
+          var novoProduto =  _repository.CreateProdutos(produto);
+            return new CreatedAtRouteResult("Obter Produtos", new {id = novoProduto.ProdutoId}, novoProduto);
             
         }
 
@@ -55,7 +55,12 @@ namespace ApiCatalago.Controllers
         {
         
             var produtos = _repository.GetProdutoById(id);
-            
+
+            if (id != produto.ProdutoId)
+            {
+                return BadRequest();
+            }
+
             _repository.UpdateProduto(produtos);     
             return Ok(produtos);
 
