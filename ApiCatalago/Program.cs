@@ -21,10 +21,25 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddControllers(options =>
 { 
-options.Filters.Add(typeof(ApiExceptionFilter));
+    options.Filters.Add(typeof(ApiExceptionFilter));
 }).
 AddJsonOptions(options => options.JsonSerializerOptions
-        .ReferenceHandler = ReferenceHandler.IgnoreCycles);
+    .ReferenceHandler = ReferenceHandler.IgnoreCycles);
+
+builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler(options =>
+{
+    options.ExceptionHandler = async context =>
+    {
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        await context.Response.WriteAsJsonAsync(new
+        {
+            Status = context.Response.StatusCode,
+            Message = "Ocorreu um erro interno no servidor"
+        });
+    };
+});
+
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -46,8 +61,9 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    app.UseExceptionHandler();
 }
+
+app.UseExceptionHandler();
 
 app.UseHttpsRedirection();
 
