@@ -11,21 +11,23 @@ namespace ApiCatalago.Controllers
     public class ProdutosController : ControllerBase
     {
 
-        private readonly IProdutoRepository _repository;
-
-        public ProdutosController(IProdutoRepository repository)
+        private readonly IProdutoRepository _produtoRepository;
+        public ProdutosController(IProdutoRepository produtoRepository)
         {
 
-            _repository = repository;
+            _produtoRepository = produtoRepository;
 
         }
 
 
         [HttpGet]
-        public ActionResult<IEnumerable<Produto>> GetProdutos()
+        public ActionResult<IEnumerable<Produto>> GetAllProdutos()
         {
-
-            var produtos = _repository.GetProdutos().OrderBy(p => p.ProdutoId).ToList();
+            var produtos = _produtoRepository.GetAll().OrderBy(p => p.ProdutoId).ToList();
+            if (produtos is null)
+            {
+                return NotFound();
+            }
             return  Ok(produtos);
 
         }
@@ -34,9 +36,20 @@ namespace ApiCatalago.Controllers
         [HttpGet("{id}", Name ="Obter Produtos")]
         public ActionResult<Produto> GetProdutoById (int id)
         {
-            var produto =  _repository.GetProdutoById(id);
+            var produto =  _produtoRepository.GetById(id);
             return  Ok(produto);
 
+        }
+
+        [HttpGet("categoria/{idCategoria}", Name = "Obter Produtos por Categoria")]
+        public ActionResult<IEnumerable<Produto>> GetProdutosPorCategoria(int idCategoria)
+        {
+            var produtos = _produtoRepository.GetProdutosPorCategoria(idCategoria);
+            if (produtos is null)
+            {
+                return NotFound();
+            }
+            return Ok(produtos);
         }
 
 
@@ -44,7 +57,7 @@ namespace ApiCatalago.Controllers
         public ActionResult AddProduto(Produto produto)
         {
 
-          var novoProduto =  _repository.CreateProdutos(produto);
+          var novoProduto =  _produtoRepository.Create(produto);
             return new CreatedAtRouteResult("Obter Produtos", new {id = novoProduto.ProdutoId}, novoProduto);
             
         }
@@ -54,14 +67,14 @@ namespace ApiCatalago.Controllers
         public ActionResult UpdateProduto(int id, Produto produto)
         {
         
-            var produtos = _repository.GetProdutoById(id);
+            var produtos = _produtoRepository.GetById(id);
 
             if (id != produto.ProdutoId)
             {
                 return BadRequest();
             }
 
-            _repository.UpdateProduto(produtos);     
+            _produtoRepository.Update(produtos);     
             return Ok(produtos);
 
         }
@@ -70,9 +83,9 @@ namespace ApiCatalago.Controllers
         [HttpDelete("{id}")]
         public ActionResult RemoveProduto(int id)
         {
-            var produto = _repository.GetProdutoById(id);
+            var produto = _produtoRepository.GetById(id);
 
-            _repository.DeleteProduto(id);
+            _produtoRepository.Delete(produto);
             return Ok(produto);
 
 
