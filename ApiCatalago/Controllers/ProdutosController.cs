@@ -37,6 +37,10 @@ namespace ApiCatalago.Controllers
         public ActionResult<Produto> GetProdutoById (int id)
         {
             var produto =  _produtoRepository.GetById(id);
+            if (produto is null)
+            {
+                return NotFound("Produto nao encontrado");
+            }
             return  Ok(produto);
 
         }
@@ -47,7 +51,7 @@ namespace ApiCatalago.Controllers
             var produtos = _produtoRepository.GetProdutosPorCategoria(idCategoria);
             if (produtos is null)
             {
-                return NotFound();
+                return NotFound("Produto nao encontrado");
             }
             return Ok(produtos);
         }

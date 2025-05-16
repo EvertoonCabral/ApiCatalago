@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace ApiCatalago.Models;
 
@@ -22,7 +23,8 @@ public class Categoria
     [Required]
     [StringLength(55)]
     public String? Nome { get; set; }
-
+    
+    [JsonIgnore]
     public virtual ICollection<Produto>? Produtos{ get; set; }
 
 }
