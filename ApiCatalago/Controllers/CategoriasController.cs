@@ -9,12 +9,14 @@ namespace APICatalogo.Controllers;
 [ApiController]
 public class CategoriasController : ControllerBase
 {
-    private readonly IRepository<Categoria> _repository;
+
+    private UnitOfWork _unitOfWork;
     private readonly ILogger<CategoriasController> _logger;
 
-    public CategoriasController(ICategoriaRepository repository, ILogger<CategoriasController> logger)
+
+    public CategoriasController(UnitOfWork unitOfWork, ILogger<CategoriasController> logger)
     {
-        _repository = repository;
+        _unitOfWork = unitOfWork;
         _logger = logger;
     }
 
@@ -22,7 +24,7 @@ public class CategoriasController : ControllerBase
     [ProducesResponseType(typeof(IEnumerable<Categoria>), StatusCodes.Status200OK)]
     public ActionResult<IEnumerable<Categoria>> GetAllCategorias()
     {
-        var categorias = _repository.GetAll();
+        var categorias = _unitOfWork.CategoriaRepository.GetAll();
         return Ok(categorias);
     }
 
@@ -31,7 +33,7 @@ public class CategoriasController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public ActionResult<Categoria> GetCategoriaById(int id)
     {
-        var categoria = _repository.GetById(id);
+        var categoria = _unitOfWork.CategoriaRepository.GetById(id);
 
         if (categoria == null)
         {
@@ -53,7 +55,8 @@ public class CategoriasController : ControllerBase
             return BadRequest("Dados inválidos");
         }
 
-        _repository.Create(categoria);
+        _unitOfWork.CategoriaRepository.Create(categoria);
+        _unitOfWork.Commit();
 
         return new CreatedAtRouteResult("ObterCategoria", new { id = categoria.CategoriaId }, categoria);
     }
@@ -69,7 +72,8 @@ public class CategoriasController : ControllerBase
             return BadRequest("Dados inválidos");
         }
 
-        _repository.Update(categoria);
+        _unitOfWork.CategoriaRepository.Update(categoria);
+        _unitOfWork.Commit();
         return Ok(categoria);
     }
 
@@ -78,7 +82,7 @@ public class CategoriasController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public ActionResult DeleteCategoria(int id)
     {
-        var categoria = _repository.GetById(id);
+        var categoria = _unitOfWork.CategoriaRepository.GetById(id);
 
         if (categoria == null)
         {
@@ -86,7 +90,8 @@ public class CategoriasController : ControllerBase
             return NotFound($"Categoria com id={id} não encontrada...");
         }
 
-        _repository.Delete(categoria);
+        _unitOfWork.CategoriaRepository.Delete(categoria);
+        _unitOfWork.Commit();
 
         return Ok(categoria);
     }
