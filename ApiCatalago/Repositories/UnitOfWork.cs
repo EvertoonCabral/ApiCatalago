@@ -13,7 +13,7 @@ public class UnitOfWork : IUnitOfWork
         _context = context;
     }
 
-//garanti que o context somente sera criado caso não exista um.
+//garante que o context somente sera criado caso não exista um.
     public ICategoriaRepository CategoriaRepository
     {
         get
