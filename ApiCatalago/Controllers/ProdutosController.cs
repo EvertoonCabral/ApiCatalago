@@ -3,29 +3,50 @@ using ApiCatalago.DTOs;
 using ApiCatalago.Models;
 using ApiCatalago.Repositories;
 using AutoMapper;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace ApiCatalago.Controllers
 {
+    /// <summary>
+    /// Controller responsible for handling operations related to "Produtos".
+    /// Provides endpoints for creating, reading, updating, and deleting product data,
+    /// as well as retrieving products filtered by specific criteria such as category.
+    /// </summary>
     [ApiController]
     [Route("[controller]")]
     public class ProdutosController : ControllerBase
     {
-
- 
+        /// <summary>
+        /// Represents an instance of the UnitOfWork class, which is responsible for providing
+        /// access to repository objects and managing database transactions in the application.
+        /// </summary>
         private readonly UnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
-        
 
+        /// <summary>
+        /// Provides an instance of the AutoMapper <see cref="IMapper"/> used to handle object-object mapping within the controller.
+        /// </summary>
+        /// <remarks>
+        /// The <c>_mapper</c> field is responsible for transforming data between domain entities and DTOs.
+        /// It facilitates converting complex data models to DTOs or mapping incoming data to domain models in operations such as
+        /// GET, POST, PUT, and PATCH requests, ensuring cleaner and more maintainable code by abstracting the mapping logic.
+        /// </remarks>
+        private readonly IMapper _mapper;
+
+
+        /// <summary>
+        /// Controller responsible for managing operations related to products.
+        /// </summary>
         public ProdutosController(UnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-        
 
 
+        /// Retrieves a list of all products in the catalog, ordered by their ID.
+        /// <returns>An ActionResult containing an IEnumerable of ProdutoDTOs representing the list of all products.</returns>
         [HttpGet]
         public ActionResult<IEnumerable<ProdutoDTO>> GetAllProdutos()
         {
@@ -39,7 +60,11 @@ namespace ApiCatalago.Controllers
 
         }
 
-
+        /// <summary>
+        /// Retrieves a product by its unique identifier.
+        /// </summary>
+        /// <param name="id">The unique identifier of the product.</param>
+        /// <returns>An <see cref="ActionResult{ProdutoDTO}"/> containing the product details if found; otherwise, a NotFound response.</returns>
         [HttpGet("{id}", Name ="Obter Produtos")]
         public ActionResult<ProdutoDTO> GetProdutoById (int id)
         {
@@ -53,6 +78,11 @@ namespace ApiCatalago.Controllers
 
         }
 
+        /// <summary>
+        /// Retrieves a list of products associated with a specific category.
+        /// </summary>
+        /// <param name="idCategoria">The identifier of the category to retrieve products for.</param>
+        /// <returns>A list of products belonging to the specified category if found, otherwise a NotFound result.</returns>
         [HttpGet("categoria/{idCategoria}", Name = "Obter Produtos por Categoria")]
         public ActionResult<IEnumerable<ProdutoDTO>> GetProdutosPorCategoria(int idCategoria)
         {
@@ -64,7 +94,11 @@ namespace ApiCatalago.Controllers
             return Ok(produtos);
         }
 
-
+        /// <summary>
+        /// Adds a new product to the database and returns the created product with its details.
+        /// </summary>
+        /// <param name="produtoDto">The product data transfer object containing the product details to be added.</param>
+        /// <returns>The created product data transfer object, including its unique identifier and other details.</returns>
         [HttpPost]
         public ActionResult<ProdutoDTO> AddProduto(ProdutoDTO produtoDto)
         {
@@ -76,6 +110,54 @@ namespace ApiCatalago.Controllers
         }
 
 
+        /// <summary>
+        /// Updates the stock information of a product using a partial update request.
+        /// </summary>
+        /// <param name="id">The unique identifier of the product to be updated.</param>
+        /// <param name="request">
+        /// The JSON Patch document containing the partial update for the product's stock information.
+        /// </param>
+        /// <returns>
+        /// An <see cref="ActionResult"/> containing the updated product details as a <see cref="ProdutoDTOUpdateResponse"/> if the update is successful,
+        /// or a corresponding HTTP error response if the update fails.
+        /// </returns>
+        [HttpPatch("{id}/UpdateEstoque", Name = "Atualizar Estoque")]
+        public ActionResult<ProdutoDTOUpdateResponse> PatchEstoque(int id,JsonPatchDocument<ProdutoDTOUpdateRequest> request)
+        {
+            if (id <= 0 || request is null)
+            {
+                return BadRequest();
+            }
+            var produto = _unitOfWork.ProdutoRepository.GetById(id);
+            if (produto is null)
+            {
+                return NotFound("Produto não encontrado...");
+            }
+            
+            var produtoDto = _mapper.Map<ProdutoDTOUpdateRequest>(produto);
+            request.ApplyTo(produtoDto, ModelState);
+            if (!TryValidateModel(produtoDto))
+            {
+                return BadRequest(ModelState);
+            }
+            
+            _mapper.Map(produtoDto, produto);
+            _unitOfWork.ProdutoRepository.Update(produto);
+            _unitOfWork.Commit();
+            return Ok(
+                
+                _mapper.Map<ProdutoDTOUpdateResponse>(produto)
+                
+                );
+            
+        }
+
+        /// <summary>
+        /// Updates an existing product with the provided data.
+        /// </summary>
+        /// <param name="id">The unique identifier of the product to be updated.</param>
+        /// <param name="produtoDto">The updated product data encapsulated in a ProdutoDTO object.</param>
+        /// <returns>A ProdutoDTO object representing the updated product, or a NotFound result if the product does not exist.</returns>
         [HttpPut("{id}")]
         public ActionResult<ProdutoDTO> UpdateProduto(int id, ProdutoDTO produtoDto)
         {
@@ -93,6 +175,14 @@ namespace ApiCatalago.Controllers
         }
 
 
+        /// <summary>
+        /// Removes a product identified by the given id.
+        /// </summary>
+        /// <param name="id">The ID of the product to be removed.</param>
+        /// <returns>
+        /// An <see cref="ActionResult{ProdutoDTO}"/> containing the details of the removed product
+        /// if the operation is successful, or a NotFound result if the product does not exist.
+        /// </returns>
         [HttpDelete("{id}")]
         public ActionResult<ProdutoDTO> RemoveProduto(int id)
         {
