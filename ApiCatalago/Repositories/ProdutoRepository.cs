@@ -1,5 +1,6 @@
 ﻿using ApiCatalago.Context;
 using ApiCatalago.Models;
+using ApiCatalago.Pagination;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,6 +13,17 @@ namespace ApiCatalago.Repositories
         {
             
         }
+
+        public IEnumerable<Produto> GetProdutosPaginado(ProdutosParameters produtosParameters)
+        {
+            var produtos = GetAll()
+                .OrderBy(p => p.Nome)
+                .Skip((produtosParameters.pageNumber - 1) * produtosParameters.PageSize)
+                .Take(produtosParameters.PageSize).ToList();
+
+            return produtos;
+        }
+
         public IEnumerable<Produto> GetProdutosPorCategoria(int idCategoria)
         {
             

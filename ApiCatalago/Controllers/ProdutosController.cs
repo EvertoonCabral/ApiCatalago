@@ -1,11 +1,10 @@
-﻿using ApiCatalago.Context;
-using ApiCatalago.DTOs;
+﻿using ApiCatalago.DTOs;
 using ApiCatalago.Models;
+using ApiCatalago.Pagination;
 using ApiCatalago.Repositories;
 using AutoMapper;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace ApiCatalago.Controllers
 {
@@ -22,7 +21,7 @@ namespace ApiCatalago.Controllers
         /// Represents an instance of the UnitOfWork class, which is responsible for providing
         /// access to repository objects and managing database transactions in the application.
         /// </summary>
-        private readonly UnitOfWork _unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
 
         /// <summary>
         /// Provides an instance of the AutoMapper <see cref="IMapper"/> used to handle object-object mapping within the controller.
@@ -38,7 +37,7 @@ namespace ApiCatalago.Controllers
         /// <summary>
         /// Controller responsible for managing operations related to products.
         /// </summary>
-        public ProdutosController(UnitOfWork unitOfWork, IMapper mapper)
+        public ProdutosController(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -59,6 +58,22 @@ namespace ApiCatalago.Controllers
             return Ok(produtosDto);
 
         }
+
+        [HttpGet("paginado", Name = "Produtos Paginados")]
+        public ActionResult<IEnumerable<ProdutoDTO>> GetProdutosPaginado([FromQuery]ProdutosParameters produtosParameters)
+        {
+            var produtos = _unitOfWork.ProdutoRepository.GetProdutosPaginado(produtosParameters);
+
+            if (produtos is null)
+            {
+                return BadRequest();
+            }
+
+            var produtosDto = _mapper.Map<IEnumerable<ProdutoDTO>>(produtos);
+            
+            return Ok(produtosDto);
+        }
+        
 
         /// <summary>
         /// Retrieves a product by its unique identifier.
