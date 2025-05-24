@@ -1,11 +1,11 @@
 namespace ApiCatalago.Pagination;
 
-public class ProdutosParameters
+public abstract class QueryStringParameters
 {
     
-    private int maxPageSize { get; set; } = 10;
-    public int pageNumber { get; set; } = 1;
-    private int _pageSize;
+    const int maxPageSize  = 10;
+    public int PageNumber { get; set; } = 1;
+    private int _pageSize = maxPageSize;
 
     public int PageSize
     {

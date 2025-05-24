@@ -5,6 +5,7 @@ using ApiCatalago.Repositories;
 using AutoMapper;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace ApiCatalago.Controllers
 {
@@ -60,9 +61,9 @@ namespace ApiCatalago.Controllers
         }
 
         [HttpGet("paginado", Name = "Produtos Paginados")]
-        public ActionResult<IEnumerable<ProdutoDTO>> GetProdutosPaginado([FromQuery]ProdutosParameters produtosParameters)
+        public ActionResult<IEnumerable<ProdutoDTO>> GetProdutosPaginado([FromQuery]QueryStringParameters queryStringParameters)
         {
-            var produtos = _unitOfWork.ProdutoRepository.GetProdutosPaginado(produtosParameters);
+            var produtos = _unitOfWork.ProdutoRepository.GetProdutosPaginado(queryStringParameters);
 
             if (produtos is null)
             {
@@ -73,7 +74,37 @@ namespace ApiCatalago.Controllers
             
             return Ok(produtosDto);
         }
-        
+
+        [HttpGet("filtro/paginado/preco")]
+        public ActionResult<IEnumerable<ProdutoDTO>> GetProdutosFiltroPreco(
+            [FromQuery] ProdutosFiltroPreco produtosFiltroPreco)
+        {
+            var produtos = _unitOfWork.ProdutoRepository.GetProdutosFiltroPreco(produtosFiltroPreco);
+            if (produtos is null)
+            {
+                return BadRequest();
+            }
+            
+            return ObterProduto(produtos);
+        }
+
+        private ActionResult<IEnumerable<ProdutoDTO>> ObterProduto(PagedList<Produto> produtos)
+        {
+            var metadata = new
+            {
+                produtos.TotalCount,
+                produtos.PageSize,
+                produtos.CurrentPage,
+                produtos.TotalPages,
+                produtos.HasNext,
+                produtos.HasPrevious
+            };
+
+            Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(metadata));
+            var produtosDto = _mapper.Map<IEnumerable<ProdutoDTO>>(produtos);
+            return Ok(produtosDto);
+        }
+
 
         /// <summary>
         /// Retrieves a product by its unique identifier.
