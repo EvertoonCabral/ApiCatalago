@@ -1,5 +1,6 @@
 using ApiCatalago.Context;
 using ApiCatalago.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace ApiCatalago.Repositories;
 
@@ -12,16 +13,16 @@ public class Repository<T> : IRepository<T> where T : class
         _context = context;
     }
     
-    public IEnumerable<T> GetAll()
+    public async Task<IEnumerable<T>> GetAllAsync()
     {
-      return  _context.Set<T>().ToList();
+      return  await _context.Set<T>().ToListAsync();
         
     }
 
-    public T GetById(int id)
+    public async Task<T> GetByIdAsync(int id)
     {
         
-        return _context.Set<T>().Find(id);
+        return await _context.Set<T>().FindAsync(id) ?? throw new NullReferenceException();
     }
 
     //Comentado savechanges pois essa operacao é realizada no commit da UnitOfWork

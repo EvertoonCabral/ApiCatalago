@@ -1,7 +1,7 @@
 ﻿using ApiCatalago.Context;
 using ApiCatalago.Models;
 using ApiCatalago.Pagination;
-using Microsoft.AspNetCore.Http.HttpResults;
+using System.Linq;
 using Microsoft.EntityFrameworkCore;
 
 namespace ApiCatalago.Repositories
@@ -14,9 +14,11 @@ namespace ApiCatalago.Repositories
             
         }
 
-        public IEnumerable<Produto> GetProdutosPaginado(QueryStringParameters queryStringParameters)
+        public async Task<IEnumerable<Produto>> GetProdutosPaginado(QueryStringParameters queryStringParameters)
         {
-            var produtos = GetAll()
+            var todosOsProdutos = await GetAllAsync();
+            
+            var produtos =  todosOsProdutos
                 .OrderBy(p => p.Nome)
                 .Skip((queryStringParameters.PageNumber - 1) * queryStringParameters.PageSize)
                 .Take(queryStringParameters.PageSize).ToList();
@@ -24,18 +26,21 @@ namespace ApiCatalago.Repositories
             return produtos;
         }
 
-        public IEnumerable<Produto> GetProdutosPorCategoria(int idCategoria)
+        public async Task<IEnumerable<Produto>> GetProdutosPorCategoria(int idCategoria)
         {
+            if (_context.Produtos != null)
+            {
+                var produtos = await _context.Produtos.Where(p => p.CategoriaId == idCategoria).ToListAsync();
+                return produtos;
+            }
             
-            var produtos = _context.Produtos.Where(p => p.CategoriaId == idCategoria);
-            return produtos;
-            
+            return null!;
         }
 
-        public PagedList<Produto> GetProdutosFiltroPreco(ProdutosFiltroPreco produtosFiltroParams)
+        public async Task<PagedList<Produto>> GetProdutosFiltroPreco(ProdutosFiltroPreco produtosFiltroParams)
         {
             
-            var produtos = GetAll().AsQueryable();
+            var produtos = _context.Set<Produto>().AsQueryable();
             
             if (produtosFiltroParams.Preco.HasValue && !string.IsNullOrEmpty(produtosFiltroParams.PrecoCriterio))
             {

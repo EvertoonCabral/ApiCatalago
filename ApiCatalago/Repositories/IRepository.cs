@@ -3,9 +3,9 @@
     public interface IRepository<T> 
     {
         
-        IEnumerable<T> GetAll();
+        Task<IEnumerable<T>> GetAllAsync();
         
-        T GetById(int id);
+       Task <T> GetByIdAsync(int id);
         
         T Create(T entity);
         
