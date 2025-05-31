@@ -24,9 +24,9 @@ public class CategoriasController : ControllerBase
 
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<CategoriaDTO>), StatusCodes.Status200OK)]
-    public ActionResult<IEnumerable<CategoriaDTO>> GetAllCategorias()
+    public async Task<ActionResult<IEnumerable<CategoriaDTO>>>GetAllCategorias()
     {
-        var categorias = _unitOfWork.CategoriaRepository.GetAll();
+        var categorias =  await _unitOfWork.CategoriaRepository.GetAllAsync();
 
         if (categorias is null)
         {
@@ -37,12 +37,12 @@ public class CategoriasController : ControllerBase
         return Ok(categoriasDto);
     }
 
-    [HttpGet("{id:int}", Name = "ObterCategoria")]
+    [HttpGet("{id}", Name = "ObterCategoria")]
     [ProducesResponseType(typeof(CategoriaDTO), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public ActionResult<CategoriaDTO> GetCategoriaById(int id)
+    public async Task <ActionResult<CategoriaDTO>> GetCategoriaById(int id)
     {
-        var categoria = _unitOfWork.CategoriaRepository.GetById(id);
+        var categoria = await _unitOfWork.CategoriaRepository.GetByIdAsync(id);
 
         if (categoria == null)
         {
@@ -99,9 +99,9 @@ public class CategoriasController : ControllerBase
     [HttpDelete("{id:int}")]
     [ProducesResponseType(typeof(CategoriaDTO), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public ActionResult<CategoriaDTO> DeleteCategoria(int id)
+    public async Task<ActionResult<CategoriaDTO>> DeleteCategoria(int id)
     {
-        var categoria = _unitOfWork.CategoriaRepository.GetById(id);
+        var categoria = await _unitOfWork.CategoriaRepository.GetByIdAsync(id);
         
         if (categoria == null)
         {

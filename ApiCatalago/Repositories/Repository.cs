@@ -15,7 +15,7 @@ public class Repository<T> : IRepository<T> where T : class
     
     public async Task<IEnumerable<T>> GetAllAsync()
     {
-      return  await _context.Set<T>().ToListAsync();
+      return  await _context.Set<T>().AsNoTracking().ToListAsync();
         
     }
 
