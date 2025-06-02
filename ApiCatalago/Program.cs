@@ -5,6 +5,7 @@ using ApiCatalago.Repositories;
 using APICatalogo.Logging;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
+using ApiCatalago.Models;
 using Microsoft.AspNetCore.Identity;
 
 
@@ -43,7 +44,7 @@ builder.Services.AddExceptionHandler(options =>
     };
 });
 
-builder.Services.AddIdentity<IdentityUser, IdentityRole>().
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>().
     AddEntityFrameworkStores<AppDbContext>().
     AddDefaultTokenProviders();
 
