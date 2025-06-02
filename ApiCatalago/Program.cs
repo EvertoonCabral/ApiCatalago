@@ -5,7 +5,7 @@ using ApiCatalago.Repositories;
 using APICatalogo.Logging;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
-
+using Microsoft.AspNetCore.Identity;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -42,6 +42,10 @@ builder.Services.AddExceptionHandler(options =>
         });
     };
 });
+
+builder.Services.AddIdentity<IdentityUser, IdentityRole>().
+    AddEntityFrameworkStores<AppDbContext>().
+    AddDefaultTokenProviders();
 
 builder.Services.AddAuthentication();
 builder.Services.AddAuthentication("Bearer").AddJwtBearer();
