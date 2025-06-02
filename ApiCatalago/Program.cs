@@ -43,6 +43,8 @@ builder.Services.AddExceptionHandler(options =>
     };
 });
 
+builder.Services.AddAntiforgery();
+builder.Services.AddAuthentication("Bearer").AddJwtBearer();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<ApiLoggingFilter>();
 builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
