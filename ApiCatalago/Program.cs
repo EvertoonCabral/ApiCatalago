@@ -6,6 +6,7 @@ using APICatalogo.Logging;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using ApiCatalago.Models;
+using ApiCatalago.Services.Authentication;
 using Microsoft.AspNetCore.Identity;
 
 
@@ -48,6 +49,9 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>().
     AddEntityFrameworkStores<AppDbContext>().
     AddDefaultTokenProviders();
 
+builder.Services.AddSwaggerGen();
+builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddAuthentication();
 builder.Services.AddAuthentication("Bearer").AddJwtBearer();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -56,8 +60,8 @@ builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
 builder.Services.AddScoped<IProdutoRepository, ProdutoRepository>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddSwaggerGen();
-builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddScoped<ITokenService, TokenService>();
+
 
 
 builder.Logging.AddProvider(new CustomLoggerProvider(new CustomLoggerProviderConfig
