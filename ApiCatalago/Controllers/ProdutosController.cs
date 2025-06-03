@@ -14,6 +14,7 @@ namespace ApiCatalago.Controllers
     /// Provides endpoints for creating, reading, updating, and deleting product data,
     /// as well as retrieving products filtered by specific criteria such as category.
     /// </summary>
+    
     [ApiController]
     [Route("[controller]")]
     public class ProdutosController : ControllerBase
